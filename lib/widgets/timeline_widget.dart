@@ -2,41 +2,87 @@
 import 'package:flutter/material.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
-class TimelineWidget extends StatelessWidget {
-  const TimelineWidget({super.key});
+class TimelineWidget extends StatefulWidget {
+  final String routine;
+  const TimelineWidget({super.key, required this.routine});
+
+  @override
+  State<TimelineWidget> createState() => _TimelineWidgetState();
+}
+
+class _TimelineWidgetState extends State<TimelineWidget> {
+  List<Map<String, dynamic>> _tasks = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _parseRoutine(widget.routine);
+  }
+
+  void _parseRoutine(String routine) {
+    final List<Map<String, dynamic>> tasks = [];
+    final lines = routine.split('\n');
+    for (final line in lines) {
+      final parts = line.split(' - ');
+      if (parts.length == 3) {
+        tasks.add({
+          'time': parts[0],
+          'event': parts[1],
+          'icon': _getIconData(parts[2]),
+        });
+      }
+    }
+    setState(() {
+      _tasks = tasks;
+    });
+  }
+
+  IconData _getIconData(String iconName) {
+    switch (iconName.toLowerCase()) {
+      case 'wb_sunny':
+        return Icons.wb_sunny;
+      case 'fitness_center':
+        return Icons.fitness_center;
+      case 'free_breakfast':
+        return Icons.free_breakfast;
+      case 'work':
+        return Icons.work;
+      case 'school':
+        return Icons.school;
+      case 'book':
+        return Icons.book;
+      case 'computer':
+        return Icons.computer;
+      case 'run_circle':
+        return Icons.run_circle;
+      case 'sports_gymnastics':
+        return Icons.sports_gymnastics;
+      case 'self_improvement':
+        return Icons.self_improvement;
+      case 'spa':
+        return Icons.spa;
+      default:
+        return Icons.task;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        TaskTimelineTile(
-          isFirst: true,
-          isLast: false,
-          event: 'Wake up',
-          time: '7:00 AM',
-          icon: Icons.wb_sunny,
-        ),
-        TaskTimelineTile(
-          isFirst: false,
-          isLast: false,
-          event: 'Morning Workout',
-          time: '7:30 AM',
-          icon: Icons.fitness_center,
-        ),
-        TaskTimelineTile(
-          isFirst: false,
-          isLast: false,
-          event: 'Breakfast',
-          time: '8:30 AM',
-          icon: Icons.free_breakfast,
-        ),
-        TaskTimelineTile(
-          isFirst: false,
-          isLast: true,
-          event: 'Start Work',
-          time: '9:00 AM',
-          icon: Icons.work,
-        ),
+        if (_tasks.isEmpty)
+          const Center(
+            child: Text('No routine generated yet.'),
+          )
+        else
+          for (int i = 0; i < _tasks.length; i++)
+            TaskTimelineTile(
+              isFirst: i == 0,
+              isLast: i == _tasks.length - 1,
+              event: _tasks[i]['event'],
+              time: _tasks[i]['time'],
+              icon: _tasks[i]['icon'],
+            ),
       ],
     );
   }
@@ -109,11 +155,13 @@ class _TaskTimelineTileState extends State<TaskTimelineTile> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  widget.event,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    decoration: _isDone ? TextDecoration.lineThrough : TextDecoration.none,
+                Flexible(
+                  child: Text(
+                    widget.event,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      decoration: _isDone ? TextDecoration.lineThrough : TextDecoration.none,
+                    ),
                   ),
                 ),
                 Row(

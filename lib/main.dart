@@ -4,25 +4,27 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:mongo_dart/mongo_dart.dart' hide State, Center;
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart'; // This file will be generated
+import 'firebase_options.dart';
 import 'models/models.dart';
 import 'persona_selection_screen.dart';
 import 'theme_provider.dart';
 
-// Placeholder for database connection details
 const String dbConnectionSting = "mongodb+srv://speakaceuser:kwPF0Z2T7X2SF8EE1@cluster0.8uuoyy6.mongodb.net/speak-ace?retryWrites=true&w=majority&appName=Cluster0";
 const String dbName = "speak-ace";
 
-void main() async { // Make main async
-  WidgetsFlutterBinding.ensureInitialized(); // Ensure bindings are initialized
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform, // Initialize Firebase
+    options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  final dbService = DatabaseService();
+  await dbService.connect();
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => DatabaseService()),
+        ChangeNotifierProvider.value(value: dbService),
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
       ],
       child: const MyApp(),
@@ -57,8 +59,6 @@ class DatabaseService with ChangeNotifier {
     if (_usersCollection == null) {
       return null;
     }
-    // For simplicity, we'll just get the latest user entry.
-    // In a real app, you'd fetch the user based on a logged-in user ID.
     final user = await _usersCollection!.find(where.sortBy('_id', descending: true).limit(1)).single;
     if (user != null) {
       return User.fromJson(user);
@@ -72,7 +72,7 @@ class DatabaseService with ChangeNotifier {
     }
     try {
       await _usersCollection!.insertOne({
-        'email': 'user@example.com', // Placeholder
+        'email': 'user@example.com',
         'persona': persona,
       });
       debugPrint('User persona updated to: $persona');
@@ -115,19 +115,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => HomePageState();
-}
-
-class HomePageState extends State<HomePage> {
-  @override
-  void initState() {
-    super.initState();
-    Provider.of<DatabaseService>(context, listen: false).connect();
-  }
 
   @override
   Widget build(BuildContext context) {

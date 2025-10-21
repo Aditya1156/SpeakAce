@@ -9,6 +9,7 @@ import 'widgets/professional_dashboard_widget.dart';
 import 'widgets/athlete_dashboard_widget.dart';
 import 'widgets/wellness_enthusiast_dashboard_widget.dart';
 import 'widgets/timeline_widget.dart';
+import 'services/ai_service.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -19,10 +20,13 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   User? _user;
+  late final AIService _aiService;
+  Future<String>? _routineFuture;
 
   @override
   void initState() {
     super.initState();
+    _aiService = AIService();
     _loadUserData();
   }
 
@@ -30,6 +34,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final user = await Provider.of<DatabaseService>(context, listen: false).getCurrentUser();
     setState(() {
       _user = user;
+      if (_user != null) {
+        _routineFuture = _aiService.generateRoutine(_user!.persona!);
+      }
     });
   }
 
@@ -75,7 +82,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 20),
                 _getPersonaWidget(_user!.persona),
                 const SizedBox(height: 20),
-                const TimelineWidget(),
+                FutureBuilder<String>(
+                  future: _routineFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      return TimelineWidget(routine: snapshot.data ?? '');
+                    }
+                  },
+                ),
               ],
             ),
     );

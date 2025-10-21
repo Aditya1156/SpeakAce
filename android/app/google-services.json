@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "997098289469",
+    "project_id": "speak-ace-flutter",
+    "storage_bucket": "speak-ace-flutter.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:997098289469:android:862883d8465c923ac2ed54",
+        "android_client_info": {
+          "package_name": "com.example.myapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqxzfbCjmYlc1BXahGdy4p99E2wojg-9k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
