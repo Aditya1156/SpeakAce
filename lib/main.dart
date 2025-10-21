@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -9,14 +8,13 @@ import 'models/models.dart';
 import 'persona_selection_screen.dart';
 import 'theme_provider.dart';
 
-const String dbConnectionSting = "mongodb+srv://speakaceuser:kwPF0Z2T7X2SF8EE1@cluster0.8uuoyy6.mongodb.net/speak-ace?retryWrites=true&w=majority&appName=Cluster0";
+const String dbConnectionSting =
+    "mongodb+srv://speakaceuser:kwPF0Z2T7X2SF8EE1@cluster0.8uuoyy6.mongodb.net/speak-ace?retryWrites=true&w=majority&appName=Cluster0";
 const String dbName = "speak-ace";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   final dbService = DatabaseService();
   await dbService.connect();
@@ -59,7 +57,9 @@ class DatabaseService with ChangeNotifier {
     if (_usersCollection == null) {
       return null;
     }
-    final user = await _usersCollection!.find(where.sortBy('_id', descending: true).limit(1)).single;
+    final user = await _usersCollection!
+        .find(where.sortBy('_id', descending: true).limit(1))
+        .single;
     if (user != null) {
       return User.fromJson(user);
     }
@@ -139,7 +139,9 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const PersonaSelectionScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const PersonaSelectionScreen(),
+                  ),
                 );
               },
               child: const Text('Get Started'),
